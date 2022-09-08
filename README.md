@@ -1,5 +1,7 @@
 # ezops
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/guoyk93/ezops.svg)](https://pkg.go.dev/github.com/guoyk93/ezops)
+
 A simple GitOps tool, based on one-off run, easy to integrate with existing CI/CD routine
 
 NO DAEMON, NO SERVICE, JUST ONE-OFF EXECUTION
@@ -70,7 +72,9 @@ kube-system/
   primary.ingress-nginx.helm.yaml
 ```
 
-`ezops` will create or update a **Release** named `primary` in **Namespace** `kube-system`, using **Chart** at `_helm/ingress-nginx`
+`ezops` will create or update a **Release** named `primary` in **Namespace** `kube-system`,
+
+using **Chart** at `_helm/ingress-nginx`, and **Values File** at `kube-system/primary.ingress-nginx.helm.yaml`
 
 ## Upstream
 
