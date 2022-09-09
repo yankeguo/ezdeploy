@@ -205,7 +205,7 @@ func main() {
 	db := grace.Must(ezkv.Open(ctx, ezkv.Options{
 		Client:    client,
 		Namespace: "default",
-		Name:      "gopsdb",
+		Name:      "ezopsdb",
 	}))
 	defer func() {
 		_ = db.Save(ctx)
