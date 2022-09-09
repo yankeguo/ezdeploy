@@ -6,6 +6,10 @@ A simple GitOps tool, based on one-off run, easy to integrate with existing CI/C
 
 NO DAEMON, NO SERVICE, JUST ONE-OFF EXECUTION
 
+## 中文使用说明
+
+[ezops - 简易 GitOps 工具](https://mp.weixin.qq.com/s/TI2ZozyA5xWltTEwIF46ag)
+
 ## Features
 
 * Support `yaml`, `json`, `jsonnet` and `Helm`
