@@ -2,6 +2,8 @@ module github.com/guoyk93/ezops
 
 go 1.18
 
+retract v1.0.0
+
 require (
 	github.com/google/go-jsonnet v0.18.0
 	github.com/guoyk93/grace v0.0.0-20220908064622-f813d6810dda
