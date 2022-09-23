@@ -29,7 +29,7 @@ You can either build binary from source, or just download pre-built binary.
 
 * Download pre-built binaries
 
-    View https://github.com/guoyk93/ezops/releases
+    View <https://github.com/guoyk93/ezops/releases>
 
 ## Usage
 
@@ -82,13 +82,13 @@ using **Chart** at `_helm/ingress-nginx`, and **Values File** at `kube-system/pr
 
 ## Upstream
 
-https://git.guoyk.net/go-guoyk/gops
+<https://git.guoyk.net/go-guoyk/gops>
 
 Due to various reasons, codebase is detached from upstream.
 
 ## Donation
 
-![oss-donation-wx](https://www.guoyk.net/oss-donation-wx.png)
+See <https://guoyk93.github.io/#donation>
 
 ## Credits
 
