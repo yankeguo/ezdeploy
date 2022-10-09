@@ -88,7 +88,7 @@ Due to various reasons, codebase is detached from upstream.
 
 ## Donation
 
-See <https://guoyk93.github.io/#donation>
+See <https://guoyk.xyz/donation>
 
 ## Credits
 
