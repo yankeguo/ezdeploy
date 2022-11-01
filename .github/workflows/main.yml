@@ -2,16 +2,15 @@ name: main
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-
       - uses: actions/checkout@v3
 
       - name: golang setup
@@ -21,6 +20,14 @@ jobs:
 
       - name: golang build
         run: go build -v ./...
+
+      - name: setup kubernetes
+        env:
+          KUBECONFIG_BASE64: ${{secrets.KUBECONFIG_BASE64}}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${KUBECONFIG_BASE64}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
 
       - name: golang test
         run: go test -v ./...
