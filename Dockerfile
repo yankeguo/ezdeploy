@@ -12,7 +12,7 @@ RUN apk add --no-cache ca-certificates tzdata curl && \
     curl -sSL -o helm.tar.gz "https://get.helm.sh/helm-v3.10.1-linux-amd64.tar.gz" && \
     tar xf helm.tar.gz && \
     mv -f linux-amd64/helm /usr/local/bin/helm && \
-    rm -rf helm.tar.gz linux-amd64 \
+    rm -rf helm.tar.gz linux-amd64
 
 COPY --from=builder /ezops /ezops
 
