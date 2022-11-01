@@ -36,7 +36,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: guoyk/httpcat
+          images: guoyk/ezops
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
 
