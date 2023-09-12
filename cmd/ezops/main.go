@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"github.com/guoyk93/ezops"
 	"github.com/guoyk93/ezops/pkg/ezkv"
@@ -11,11 +12,13 @@ import (
 	"github.com/guoyk93/ezops/pkg/ezsync"
 	"github.com/guoyk93/rg"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 type syncNamespaceOptions struct {
@@ -99,7 +102,11 @@ func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 
 	buf := rg.Must(json.Marshal(ezops.NewList(raws)))
 
-	args := []string{"--kubeconfig", opts.Kubeconfig, "apply", "-f", "-"}
+	args := []string{"apply", "-f", "-"}
+
+	if opts.Kubeconfig != "" {
+		args = append([]string{"--kubeconfig", opts.Kubeconfig}, args...)
+	}
 
 	if opts.Namespace != "" {
 		args = append(args, "-n", opts.Namespace)
@@ -147,11 +154,14 @@ func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
 	}
 
 	args := []string{
-		"--kubeconfig", opts.Kubeconfig,
 		"upgrade", "--install",
 		"--namespace", opts.Namespace,
 		opts.Release.Name, opts.Release.Chart.Path,
 		"-f", opts.Release.ValuesFile,
+	}
+
+	if opts.Kubeconfig != "" {
+		args = append([]string{"--kubeconfig", opts.Kubeconfig}, args...)
 	}
 
 	if opts.DryRun {
@@ -176,6 +186,47 @@ func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
 	return
 }
 
+func resolveKubernetesClient(envKubeconfig, optKubeconfig string) (client *kubernetes.Clientset, flagKubeconfig string, err error) {
+	var home string
+	if home, err = os.UserHomeDir(); err != nil {
+		return
+	}
+	if strings.HasPrefix(envKubeconfig, "~/") {
+		envKubeconfig = filepath.Join(home, envKubeconfig[2:])
+	}
+	if strings.HasPrefix(optKubeconfig, "~/") {
+		optKubeconfig = filepath.Join(home, optKubeconfig[2:])
+	}
+
+	var opts *rest.Config
+	if optKubeconfig != "" {
+		if opts, err = clientcmd.BuildConfigFromFlags("", optKubeconfig); err != nil {
+			return
+		}
+		flagKubeconfig = optKubeconfig
+	} else if envKubeconfig != "" {
+		if opts, err = clientcmd.BuildConfigFromFlags("", envKubeconfig); err != nil {
+			return
+		}
+		flagKubeconfig = envKubeconfig
+	} else {
+		if opts, err = rest.InClusterConfig(); err != nil {
+			if errors.Is(err, rest.ErrNotInCluster) {
+				path := filepath.Join(home, ".kube", "config")
+				if opts, err = clientcmd.BuildConfigFromFlags("", path); err != nil {
+					return
+				}
+				flagKubeconfig = path
+			} else {
+				return
+			}
+		}
+	}
+
+	client, err = kubernetes.NewForConfig(opts)
+	return
+}
+
 func main() {
 	var err error
 	defer func() {
@@ -187,24 +238,23 @@ func main() {
 	}()
 	defer rg.Guard(&err)
 
-	// determine user home
-	dirHome := rg.Must(os.UserHomeDir())
-
 	// cli options
 	var (
 		optDryRun     bool
 		optKubeconfig string
+
+		envKubeconfig = strings.TrimSpace(os.Getenv("KUBECONFIG"))
 	)
 
 	flag.BoolVar(&optDryRun, "dry-run", false, "dry run (server)")
-	flag.StringVar(&optKubeconfig, "kubeconfig", filepath.Join(dirHome, ".kube", "config"), "path to kubeconfig")
+	flag.StringVar(&optKubeconfig, "kubeconfig", "", "path to kubeconfig")
 	flag.Parse()
 
 	// context
 	ctx := context.Background()
 
 	// kubernetes client
-	client := rg.Must(kubernetes.NewForConfig(rg.Must(clientcmd.BuildConfigFromFlags("", optKubeconfig))))
+	client, flagKubeconfig := rg.Must2(resolveKubernetesClient(envKubeconfig, optKubeconfig))
 
 	// ezkv database
 	db := rg.Must(ezkv.Open(ctx, ezkv.Options{
@@ -223,7 +273,7 @@ func main() {
 	err = ezsync.DoPara(ctx, result.Namespaces, 5, func(ctx context.Context, namespace string) (err error) {
 		return syncNamespace(ctx, syncNamespaceOptions{
 			DB:         db,
-			Kubeconfig: optKubeconfig,
+			Kubeconfig: flagKubeconfig,
 			Root:       ".",
 			Namespace:  namespace,
 			Charts:     result.Charts,
