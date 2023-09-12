@@ -2,29 +2,30 @@
 
 set -eu
 
-cd $(dirname $0)
+cd "$(dirname "${0}")"
 
-rm -rf dist
-mkdir -p dist
+rm -rf dist && mkdir dist
+
+EXECUTABLE_NAME="ezops"
 
 build() {
-  export GOOS=$1
-  export GOARCH=$2
-  export CGO_ENABLED=0
-  FILENAME="ezops-${GOOS}-${GOARCH}"
-  go build -o "dist/${FILENAME}" ./cmd/ezops
-  cd dist
-  tar czvf "${FILENAME}.tar.gz" "${FILENAME}"
-  rm -f "${FILENAME}"
-  cd ..
+  rm -rf build && mkdir build
+  GOOS=${1} GOARCH=${2} go build -o "build/${EXECUTABLE_NAME}${3}"
+  tar -czvf "dist/${EXECUTABLE_NAME}-${1}-${2}.tar.gz" --exclude ".*" -C build "${EXECUTABLE_NAME}${3}"
+  rm -rf build
 }
 
-build linux amd64
-build windows amd64
-build darwin amd64
-build darwin arm64
+build linux amd64 ""
+build windows amd64 ".exe"
+build darwin amd64 ""
+build darwin arm64 ""
 
-build linux arm64
-build linux loong64
-build windows 386
-build freebsd amd64
+build linux arm64 ""
+build linux loong64 ""
+build windows 386 ".exe"
+build freebsd amd64 ""
+
+cd dist
+
+shasum -a 256 *.tar.gz > SHASUM256.txt
+gpg-trezor-hi@guoyk.xyz -ab SHASUM256.txt
