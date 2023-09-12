@@ -1,6 +1,6 @@
 module github.com/guoyk93/ezops
 
-go 1.18
+go 1.21
 
 retract v1.0.0
 
