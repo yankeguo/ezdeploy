@@ -1,17 +1,22 @@
-name: release
+name: build
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch: { }
   push:
-    branches: ["main"]
-    tags: ["v*.*.*"]
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - main
 
 env:
   DOCKERHUB_USERNAME: guoyk
   DOCKERHUB_IMAGE_NAME: guoyk/ezops
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -49,6 +54,7 @@ jobs:
             ${{env.DOCKERHUB_IMAGE_NAME}}
           tags: |-
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=pr,enable=${{ github.event_name == 'pull_request' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
@@ -61,6 +67,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           pull: true
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

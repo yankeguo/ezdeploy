@@ -7,10 +7,9 @@ import (
 	"flag"
 	"github.com/guoyk93/ezops"
 	"github.com/guoyk93/ezops/pkg/ezkv"
-	"github.com/guoyk93/grace"
-	"github.com/guoyk93/grace/gracelog"
-	"github.com/guoyk93/grace/gracemain"
-	"github.com/guoyk93/grace/gracesync"
+	"github.com/guoyk93/ezops/pkg/ezlog"
+	"github.com/guoyk93/ezops/pkg/ezsync"
+	"github.com/guoyk93/rg"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"log"
@@ -29,14 +28,14 @@ type syncNamespaceOptions struct {
 }
 
 func syncNamespace(ctx context.Context, opts syncNamespaceOptions) (err error) {
-	defer grace.Guard(&err)
+	defer rg.Guard(&err)
 
 	title := "[" + opts.Namespace + "]"
 	log.Println(title, "scanning")
 
-	res := grace.Must(ezops.Load(opts.Root, opts.Namespace, ezops.LoadOptions{Charts: opts.Charts}))
+	res := rg.Must(ezops.Load(opts.Root, opts.Namespace, ezops.LoadOptions{Charts: opts.Charts}))
 
-	grace.Must0(syncResources(ctx, syncResourcesOptions{
+	rg.Must0(syncResources(ctx, syncResourcesOptions{
 		DB:         opts.DB,
 		Resources:  res.Resources,
 		Title:      title,
@@ -45,7 +44,7 @@ func syncNamespace(ctx context.Context, opts syncNamespaceOptions) (err error) {
 		DryRun:     opts.DryRun,
 	}))
 
-	grace.Must0(syncResources(ctx, syncResourcesOptions{
+	rg.Must0(syncResources(ctx, syncResourcesOptions{
 		DB:         opts.DB,
 		Resources:  res.ResourcesExt,
 		Title:      title,
@@ -55,7 +54,7 @@ func syncNamespace(ctx context.Context, opts syncNamespaceOptions) (err error) {
 	}))
 
 	for _, release := range res.Releases {
-		grace.Must0(syncRelease(ctx, syncReleaseOptions{
+		rg.Must0(syncRelease(ctx, syncReleaseOptions{
 			DB:         opts.DB,
 			Release:    release,
 			Title:      title + " [Helm:" + release.Name + "]",
@@ -78,7 +77,7 @@ type syncResourcesOptions struct {
 }
 
 func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
-	defer grace.Guard(&err)
+	defer rg.Guard(&err)
 
 	var resources []ezops.Resource
 
@@ -98,7 +97,7 @@ func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 		raws = append(raws, res.Raw)
 	}
 
-	buf := grace.Must(json.Marshal(ezops.NewList(raws)))
+	buf := rg.Must(json.Marshal(ezops.NewList(raws)))
 
 	args := []string{"--kubeconfig", opts.Kubeconfig, "apply", "-f", "-"}
 
@@ -112,9 +111,9 @@ func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 
 	cmd := exec.CommandContext(ctx, "kubectl", args...)
 	cmd.Stdin = bytes.NewReader(buf)
-	cmd.Stdout = gracelog.NewLogWriter(log.Default(), opts.Title)
-	cmd.Stderr = gracelog.NewLogWriter(log.Default(), opts.Title)
-	grace.Must0(cmd.Run())
+	cmd.Stdout = ezlog.NewLogWriter(log.Default(), opts.Title)
+	cmd.Stderr = ezlog.NewLogWriter(log.Default(), opts.Title)
+	rg.Must0(cmd.Run())
 
 	if !opts.DryRun {
 		for _, res := range resources {
@@ -141,7 +140,7 @@ type syncReleaseOptions struct {
 }
 
 func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
-	defer grace.Guard(&err)
+	defer rg.Guard(&err)
 
 	if opts.DB.Get(opts.Release.ID) == opts.Release.Checksum {
 		return
@@ -160,9 +159,9 @@ func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
 	}
 
 	cmd := exec.CommandContext(ctx, "helm", args...)
-	cmd.Stdout = gracelog.NewLogWriter(log.Default(), opts.Title)
-	cmd.Stderr = gracelog.NewLogWriter(log.Default(), opts.Title)
-	grace.Must0(cmd.Run())
+	cmd.Stdout = ezlog.NewLogWriter(log.Default(), opts.Title)
+	cmd.Stderr = ezlog.NewLogWriter(log.Default(), opts.Title)
+	rg.Must0(cmd.Run())
 
 	if !opts.DryRun {
 		opts.DB.Put(opts.Release.ID, opts.Release.Checksum)
@@ -179,11 +178,17 @@ func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
 
 func main() {
 	var err error
-	defer gracemain.Exit(&err)
-	defer grace.Guard(&err)
+	defer func() {
+		if err == nil {
+			return
+		}
+		log.Println("exited with error:", err.Error())
+		os.Exit(1)
+	}()
+	defer rg.Guard(&err)
 
 	// determine user home
-	dirHome := grace.Must(os.UserHomeDir())
+	dirHome := rg.Must(os.UserHomeDir())
 
 	// cli options
 	var (
@@ -199,10 +204,10 @@ func main() {
 	ctx := context.Background()
 
 	// kubernetes client
-	client := grace.Must(kubernetes.NewForConfig(grace.Must(clientcmd.BuildConfigFromFlags("", optKubeconfig))))
+	client := rg.Must(kubernetes.NewForConfig(rg.Must(clientcmd.BuildConfigFromFlags("", optKubeconfig))))
 
 	// ezkv database
-	db := grace.Must(ezkv.Open(ctx, ezkv.Options{
+	db := rg.Must(ezkv.Open(ctx, ezkv.Options{
 		Client:    client,
 		Namespace: "default",
 		Name:      "ezopsdb",
@@ -212,10 +217,10 @@ func main() {
 	}()
 
 	// scan
-	result := grace.Must(ezops.Scan("."))
+	result := rg.Must(ezops.Scan("."))
 
 	// sync namespaces
-	err = gracesync.DoPara(ctx, result.Namespaces, 5, func(ctx context.Context, namespace string) (err error) {
+	err = ezsync.DoPara(ctx, result.Namespaces, 5, func(ctx context.Context, namespace string) (err error) {
 		return syncNamespace(ctx, syncNamespaceOptions{
 			DB:         db,
 			Kubeconfig: optKubeconfig,
