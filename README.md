@@ -29,41 +29,43 @@ You can either build binary from source, or just download pre-built binary.
 
 * Download pre-built binaries
 
-    View <https://github.com/guoyk93/ezops/releases>
+  View <https://github.com/guoyk93/ezops/releases>
 
 ## Usage
 
-1. Make sure you have valid `kubectl` and `helm` command in your `$PATH`
-2. Prepare your **resource directory**, see below
-3. Just run `ezops` command
+1. Ensure `kubectl` and `helm` are available in `$PATH`
+2. Prepare a **Manifests Directory**, see below
+3. Run `ezops`
 
 ## Options
 
 * `--dry-run`, run without actually apply any changes.
-* `--kubeconfig`, specify path to `kubeconfig` file
+* `--kubeconfig` or `KUBECONFIG`, specify path to `kubeconfig` file
 
-## Layout of Resource Directory
+## Layout of Manifests Directory
 
-* Each top-level directory stands for a **Namespace**
-* Each resource file in **Namespace** directory, will be applied to that **Namespace**
+* Each top-level directory stands for a **namespace**
+* Every manifest file in that directory, will be applied to that **namespace**
 
 For example:
 
 ```
-myapp/
-  service-a.yaml
-  service-b.jsonnet
-  service-c.json
+namespace-a/
+  workload-aa.yaml
+  workload-ab.jsonnet
+  workload-ac.json
+namespace-b/
+  workload-ba.yaml
+  workload-bb.jsonnet
+  workload-bc.json
 ```
-
-`ezops` will read `service-a.yaml`, `service-b.jsonnet`, `service-c.json` files, and apply resources to namespace `myapp`
 
 ## Helm Support
 
-* Put your `Helm` `Chart` to a special top-level directory `_helm`
-* Create values file in **Namespace** directory, with naming format `[RELEASE_NAME].[CHART_NAME].helm.yaml`
+* Put a `Helm Chart` to top-level directory `_helm`
+* Create values file in **namespace** directory, with naming format `[RELEASE_NAME].[CHART_NAME].helm.yaml`
 
-For exmaple:
+For example:
 
 ```
 _helm/
@@ -73,12 +75,11 @@ _helm/
     templates/
       ...
 kube-system/
-  primary.ingress-nginx.helm.yaml
+  main.ingress-nginx.helm.yaml
 ```
 
-`ezops` will create or update a **Release** named `primary` in **Namespace** `kube-system`,
-
-using **Chart** at `_helm/ingress-nginx`, and **Values File** at `kube-system/primary.ingress-nginx.helm.yaml`
+`ezops` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file
+** `kube-system/primary.ingress-nginx.helm.yaml`
 
 ## Donation
 
