@@ -34,14 +34,14 @@ You can either build binary from source, or just download pre-built binary.
 ## Usage
 
 1. Ensure `kubectl` and `helm` are available in `$PATH`
-2. Prepare a **Manifests Directory**, see below
+2. Prepare a **manifests directory**, see below
 3. Run `ezops`
 
 ## Options
 
 * `--dry-run`, run without actually apply any changes.
 * `--kubeconfig` or `KUBECONFIG`, specify path to `kubeconfig` file
-* `KUBECONFIG_BASE64`, base64 encoded `kubeconfig` content
+* `KUBECONFIG_BASE64`, base64 encoded `kubeconfig` file content
 
 ## Layout of Manifests Directory
 
@@ -79,8 +79,8 @@ kube-system/
   main.ingress-nginx.helm.yaml
 ```
 
-`ezops` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file
-** `kube-system/primary.ingress-nginx.helm.yaml`
+`ezops` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file**
+`kube-system/primary.ingress-nginx.helm.yaml`
 
 ## Donation
 
