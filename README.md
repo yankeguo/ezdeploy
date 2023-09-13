@@ -41,6 +41,7 @@ You can either build binary from source, or just download pre-built binary.
 
 * `--dry-run`, run without actually apply any changes.
 * `--kubeconfig` or `KUBECONFIG`, specify path to `kubeconfig` file
+* `KUBECONFIG_BASE64`, base64 encoded `kubeconfig` content
 
 ## Layout of Manifests Directory
 
