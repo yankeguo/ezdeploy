@@ -5,7 +5,7 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/gob"
-	"github.com/guoyk93/ezops/pkg/ezblob"
+	"github.com/yankeguo/ezops/pkg/ezblob"
 	"sync"
 )
 

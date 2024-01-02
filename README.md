@@ -1,6 +1,6 @@
 # ezops
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/guoyk93/ezops.svg)](https://pkg.go.dev/github.com/guoyk93/ezops)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yankeguo/ezops.svg)](https://pkg.go.dev/github.com/yankeguo/ezops)
 
 A simple GitOps tool, based on one-off run, easy to integrate with existing CI/CD routine
 
@@ -12,24 +12,24 @@ NO DAEMON, NO SERVICE, JUST ONE-OFF EXECUTION
 
 ## Features
 
-* Support `yaml`, `json`, `jsonnet` and `Helm`
-* Incremental update
+- Support `yaml`, `json`, `jsonnet` and `Helm`
+- Incremental update
 
 ## Installation
 
 You can either build binary from source, or just download pre-built binary.
 
-* Build from source
+- Build from source
 
-    ```shell
-   git clone https://github.com/guoyk93/ezops.git
-   cd ezops
-   go build -o ezops ./cmd/ezops
-    ```
+  ```shell
+  git clone https://github.com/yankeguo/ezops.git
+  cd ezops
+  go build -o ezops ./cmd/ezops
+  ```
 
-* Download pre-built binaries
+- Download pre-built binaries
 
-  View <https://github.com/guoyk93/ezops/releases>
+  View <https://github.com/yankeguo/ezops/releases>
 
 ## Usage
 
@@ -39,14 +39,14 @@ You can either build binary from source, or just download pre-built binary.
 
 ## Options
 
-* `--dry-run`, run without actually apply any changes.
-* `--kubeconfig` or `KUBECONFIG`, specify path to `kubeconfig` file
-* `KUBECONFIG_BASE64`, base64 encoded `kubeconfig` file content
+- `--dry-run`, run without actually apply any changes.
+- `--kubeconfig` or `KUBECONFIG`, specify path to `kubeconfig` file
+- `KUBECONFIG_BASE64`, base64 encoded `kubeconfig` file content
 
 ## Layout of Manifests Directory
 
-* Each top-level directory stands for a **namespace**
-* Every manifest file in that directory, will be applied to that **namespace**
+- Each top-level directory stands for a **namespace**
+- Every manifest file in that directory, will be applied to that **namespace**
 
 For example:
 
@@ -63,8 +63,8 @@ namespace-b/
 
 ## Helm Support
 
-* Put a `Helm Chart` to top-level directory `_helm`
-* Create values file in **namespace** directory, with naming format `[RELEASE_NAME].[CHART_NAME].helm.yaml`
+- Put a `Helm Chart` to top-level directory `_helm`
+- Create values file in **namespace** directory, with naming format `[RELEASE_NAME].[CHART_NAME].helm.yaml`
 
 For example:
 
@@ -81,10 +81,6 @@ kube-system/
 
 `ezops` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file**
 `kube-system/primary.ingress-nginx.helm.yaml`
-
-## Donation
-
-See https://guoyk.xyz/donation
 
 ## Credits
 

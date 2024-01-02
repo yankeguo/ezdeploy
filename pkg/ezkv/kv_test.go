@@ -2,7 +2,7 @@ package ezkv
 
 import (
 	"context"
-	"github.com/guoyk93/ezops/pkg/ezblob"
+	"github.com/yankeguo/ezops/pkg/ezblob"
 	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"

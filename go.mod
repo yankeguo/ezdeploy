@@ -1,4 +1,4 @@
-module github.com/guoyk93/ezops
+module github.com/yankeguo/ezops
 
 go 1.21
 
