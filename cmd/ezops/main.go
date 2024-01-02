@@ -5,14 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"log"
+	"os"
+	"os/exec"
+
 	"github.com/yankeguo/ezops"
 	"github.com/yankeguo/ezops/pkg/ezkv"
 	"github.com/yankeguo/ezops/pkg/ezlog"
 	"github.com/yankeguo/ezops/pkg/ezsync"
-	"github.com/guoyk93/rg"
-	"log"
-	"os"
-	"os/exec"
+	"github.com/yankeguo/rg"
 )
 
 type syncNamespaceOptions struct {
