@@ -82,6 +82,8 @@ kube-system/
 `ezops` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file**
 `kube-system/primary.ingress-nginx.helm.yaml`
 
+`ezops` also support `Helm` values file in `JSONNet`
+
 ## Credits
 
 GUO YANKE, MIT License

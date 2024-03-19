@@ -2,7 +2,7 @@ package ezops
 
 import (
 	"errors"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,8 +11,8 @@ import (
 func collectReleases(root string, namespace string, charts map[string]Chart) (releases []Release, err error) {
 	dir := filepath.Join(root, namespace)
 
-	var entries []os.FileInfo
-	if entries, err = ioutil.ReadDir(dir); err != nil {
+	var entries []fs.DirEntry
+	if entries, err = os.ReadDir(dir); err != nil {
 		return
 	}
 	for _, entry := range entries {
@@ -38,6 +38,7 @@ func collectReleases(root string, namespace string, charts map[string]Chart) (re
 			Chart:      chart,
 			ValuesFile: filepath.Join(dir, entry.Name()),
 		}
+
 		var checksum string
 		if checksum, err = checksumFile(release.ValuesFile); err != nil {
 			return

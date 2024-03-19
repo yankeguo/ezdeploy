@@ -8,11 +8,13 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/yankeguo/ezops"
 	"github.com/yankeguo/ezops/pkg/ezkv"
 	"github.com/yankeguo/ezops/pkg/ezlog"
 	"github.com/yankeguo/ezops/pkg/ezsync"
+	"github.com/yankeguo/ezops/pkg/eztmp"
 	"github.com/yankeguo/rg"
 )
 
@@ -148,11 +150,20 @@ func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
 		return
 	}
 
+	valuesFile := opts.Release.ValuesFile
+
+	// convert jsonnet file to yaml file
+	if strings.HasSuffix(opts.Release.ValuesFile, ezops.SuffixHelmValuesJSONNet) {
+		if valuesFile, err = ezops.ConvertJSONNetFileToYAML(valuesFile, opts.Namespace); err != nil {
+			return
+		}
+	}
+
 	args := []string{
 		"upgrade", "--install",
 		"--namespace", opts.Namespace,
 		opts.Release.Name, opts.Release.Chart.Path,
-		"-f", opts.Release.ValuesFile,
+		"-f", valuesFile,
 	}
 
 	if opts.Kubeconfig != "" {
@@ -191,6 +202,7 @@ func main() {
 		os.Exit(1)
 	}()
 	defer rg.Guard(&err)
+	defer eztmp.ClearAll()
 
 	// cli options
 	var (

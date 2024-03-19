@@ -2,9 +2,12 @@ package ezops
 
 import (
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"strings"
+
+	"github.com/google/go-jsonnet"
+	"github.com/yankeguo/ezops/pkg/eztmp"
 )
 
 type FileSuffixes []string
@@ -19,8 +22,8 @@ func (fs FileSuffixes) Match(path string) bool {
 }
 
 func readDirNames(dir string) (names []string, err error) {
-	var entries []os.FileInfo
-	if entries, err = ioutil.ReadDir(dir); err != nil {
+	var entries []fs.DirEntry
+	if entries, err = os.ReadDir(dir); err != nil {
 		return
 	}
 	for _, entry := range entries {
@@ -40,6 +43,19 @@ func streamFile(w io.Writer, filename string) (err error) {
 	}
 	defer f.Close()
 	if _, err = io.Copy(w, f); err != nil {
+		return
+	}
+	return
+}
+
+func ConvertJSONNetFileToYAML(file string, namespace string) (outFile string, err error) {
+	vm := jsonnet.MakeVM()
+	vm.ExtVar("NAMESPACE", namespace)
+	var raw string
+	if raw, err = vm.EvaluateFile(file); err != nil {
+		return
+	}
+	if outFile, err = eztmp.WriteFile([]byte(raw), ".yaml"); err != nil {
 		return
 	}
 	return

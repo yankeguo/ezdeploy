@@ -4,17 +4,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
+	"os"
+
 	"github.com/google/go-jsonnet"
 	"gopkg.in/yaml.v3"
-	"io"
-	"io/ioutil"
 )
 
 var (
+	SuffixHelmValuesJSONNet = ".helm.jsonnet"
+
 	SuffixesYAML       = FileSuffixes{".yaml", ".yml"}
 	SuffixesJSON       = FileSuffixes{".json"}
 	SuffixesJSONNet    = FileSuffixes{".jsonnet"}
-	SuffixesHelmValues = FileSuffixes{".helm.yaml", ".helm.yml"}
+	SuffixesHelmValues = FileSuffixes{".helm.yaml", ".helm.yml", SuffixHelmValuesJSONNet}
 )
 
 func sanitizeRawResources(raws *[]json.RawMessage) (err error) {
@@ -75,7 +78,7 @@ func collectResourceFile(file string, namespace string) (raws []json.RawMessage,
 
 func collectYAMLFile(out *[]json.RawMessage, file string) (err error) {
 	var raw []byte
-	if raw, err = ioutil.ReadFile(file); err != nil {
+	if raw, err = os.ReadFile(file); err != nil {
 		return
 	}
 	dec := yaml.NewDecoder(bytes.NewReader(raw))
@@ -107,9 +110,7 @@ func collectJSONContent(out *[]json.RawMessage, raw []byte) (err error) {
 		if err = json.Unmarshal(raw, &docs); err != nil {
 			return
 		}
-		for _, doc := range docs {
-			*out = append(*out, doc)
-		}
+		*out = append(*out, docs...)
 	} else if raw[0] == '{' {
 		*out = append(*out, raw)
 	} else {
@@ -124,7 +125,7 @@ func collectJSONContent(out *[]json.RawMessage, raw []byte) (err error) {
 
 func collectJSONFile(out *[]json.RawMessage, file string) (err error) {
 	var raw []byte
-	if raw, err = ioutil.ReadFile(file); err != nil {
+	if raw, err = os.ReadFile(file); err != nil {
 		return
 	}
 	if err = collectJSONContent(out, raw); err != nil {
