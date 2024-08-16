@@ -1,4 +1,4 @@
-package ezops
+package ezdeploy
 
 import (
 	"crypto/md5"

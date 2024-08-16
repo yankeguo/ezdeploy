@@ -6,7 +6,7 @@ cd "$(dirname "${0}")"
 
 rm -rf dist && mkdir dist
 
-EXECUTABLE_NAME="ezops"
+EXECUTABLE_NAME="ezdeploy"
 
 build() {
   rm -rf build && mkdir build

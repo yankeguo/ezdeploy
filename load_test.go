@@ -1,4 +1,4 @@
-package ezops
+package ezdeploy
 
 import (
 	"github.com/stretchr/testify/require"

@@ -1,14 +1,8 @@
-# ezops
+# ezdeploy
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/yankeguo/ezops.svg)](https://pkg.go.dev/github.com/yankeguo/ezops)
-
-A simple GitOps tool, based on one-off run, easy to integrate with existing CI/CD routine
+A simple tool to deploy various Kubernetes resources
 
 NO DAEMON, NO SERVICE, JUST ONE-OFF EXECUTION
-
-## 中文使用说明
-
-[ezops - 简易 GitOps 工具](https://mp.weixin.qq.com/s/TI2ZozyA5xWltTEwIF46ag)
 
 ## Features
 
@@ -22,20 +16,20 @@ You can either build binary from source, or just download pre-built binary.
 - Build from source
 
   ```shell
-  git clone https://github.com/yankeguo/ezops.git
-  cd ezops
-  go build -o ezops ./cmd/ezops
+  git clone https://github.com/yankeguo/ezdeploy.git
+  cd ezdeploy
+  go build -o ezdeploy ./cmd/ezdeploy
   ```
 
 - Download pre-built binaries
 
-  View <https://github.com/yankeguo/ezops/releases>
+  View <https://github.com/yankeguo/ezdeploy/releases>
 
 ## Usage
 
 1. Ensure `kubectl` and `helm` are available in `$PATH`
 2. Prepare a **manifests directory**, see below
-3. Run `ezops`
+3. Run `ezdeploy`
 
 ## Options
 
@@ -79,10 +73,10 @@ kube-system/
   main.ingress-nginx.helm.yaml
 ```
 
-`ezops` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file**
+`ezdeploy` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file**
 `kube-system/primary.ingress-nginx.helm.yaml`
 
-`ezops` also support `Helm` values file in `JSONNet`
+`ezdeploy` also support values file in `jsonnet`
 
 ## Credits
 

@@ -29,7 +29,7 @@ func ClearAll() {
 // WriteFile write file
 func WriteFile(buf []byte, suffix string) (file string, err error) {
 	var f *os.File
-	if f, err = os.CreateTemp("", "ezops-tmp-*"+suffix); err != nil {
+	if f, err = os.CreateTemp("", "ezdeploy-tmp-*"+suffix); err != nil {
 		return
 	}
 	defer f.Close()

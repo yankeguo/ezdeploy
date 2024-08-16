@@ -1,4 +1,4 @@
-package ezops
+package ezdeploy
 
 import (
 	"encoding/base64"
@@ -81,7 +81,7 @@ func ResolveKubernetesClient(optKubeconfig string) (source KubernetesClientSourc
 		if buf, err = base64.StdEncoding.DecodeString(envKubeconfigBase64); err != nil {
 			return
 		}
-		if source.TemporaryDir, err = os.MkdirTemp("", "ezops-kubeconfig-*"); err != nil {
+		if source.TemporaryDir, err = os.MkdirTemp("", "ezdeploy-kubeconfig-*"); err != nil {
 			return
 		}
 		source.KubeconfigPath = filepath.Join(source.TemporaryDir, "kubeconfig")

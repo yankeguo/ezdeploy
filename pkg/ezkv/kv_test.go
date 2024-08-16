@@ -3,7 +3,7 @@ package ezkv
 import (
 	"context"
 	"github.com/stretchr/testify/require"
-	"github.com/yankeguo/ezops/pkg/ezblob"
+	"github.com/yankeguo/ezdeploy/pkg/ezblob"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"

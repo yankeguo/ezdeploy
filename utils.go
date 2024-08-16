@@ -1,4 +1,4 @@
-package ezops
+package ezdeploy
 
 import (
 	"io"
@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/google/go-jsonnet"
-	"github.com/yankeguo/ezops/pkg/eztmp"
+	"github.com/yankeguo/ezdeploy/pkg/eztmp"
 )
 
 type FileSuffixes []string

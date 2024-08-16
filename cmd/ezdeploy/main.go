@@ -10,11 +10,11 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/yankeguo/ezops"
-	"github.com/yankeguo/ezops/pkg/ezkv"
-	"github.com/yankeguo/ezops/pkg/ezlog"
-	"github.com/yankeguo/ezops/pkg/ezsync"
-	"github.com/yankeguo/ezops/pkg/eztmp"
+	"github.com/yankeguo/ezdeploy"
+	"github.com/yankeguo/ezdeploy/pkg/ezkv"
+	"github.com/yankeguo/ezdeploy/pkg/ezlog"
+	"github.com/yankeguo/ezdeploy/pkg/ezsync"
+	"github.com/yankeguo/ezdeploy/pkg/eztmp"
 	"github.com/yankeguo/rg"
 )
 
@@ -23,7 +23,7 @@ type syncNamespaceOptions struct {
 	Kubeconfig string
 	Root       string
 	Namespace  string
-	Charts     map[string]ezops.Chart
+	Charts     map[string]ezdeploy.Chart
 	DryRun     bool
 }
 
@@ -33,7 +33,7 @@ func syncNamespace(ctx context.Context, opts syncNamespaceOptions) (err error) {
 	title := "[" + opts.Namespace + "]"
 	log.Println(title, "scanning")
 
-	res := rg.Must(ezops.Load(opts.Root, opts.Namespace, ezops.LoadOptions{Charts: opts.Charts}))
+	res := rg.Must(ezdeploy.Load(opts.Root, opts.Namespace, ezdeploy.LoadOptions{Charts: opts.Charts}))
 
 	rg.Must0(syncResources(ctx, syncResourcesOptions{
 		DB:         opts.DB,
@@ -69,7 +69,7 @@ func syncNamespace(ctx context.Context, opts syncNamespaceOptions) (err error) {
 
 type syncResourcesOptions struct {
 	DB         *ezkv.Database
-	Resources  []ezops.Resource
+	Resources  []ezdeploy.Resource
 	Title      string
 	Namespace  string
 	Kubeconfig string
@@ -79,7 +79,7 @@ type syncResourcesOptions struct {
 func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 	defer rg.Guard(&err)
 
-	var resources []ezops.Resource
+	var resources []ezdeploy.Resource
 
 	for _, res := range opts.Resources {
 		if opts.DB.Get(res.ID) == res.Checksum {
@@ -97,7 +97,7 @@ func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 		raws = append(raws, res.Raw)
 	}
 
-	buf := rg.Must(json.Marshal(ezops.NewList(raws)))
+	buf := rg.Must(json.Marshal(ezdeploy.NewList(raws)))
 
 	args := []string{"apply", "-f", "-"}
 
@@ -136,7 +136,7 @@ func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 
 type syncReleaseOptions struct {
 	DB         *ezkv.Database
-	Release    ezops.Release
+	Release    ezdeploy.Release
 	Title      string
 	Namespace  string
 	Kubeconfig string
@@ -153,8 +153,8 @@ func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
 	valuesFile := opts.Release.ValuesFile
 
 	// convert jsonnet file to yaml file
-	if strings.HasSuffix(opts.Release.ValuesFile, ezops.SuffixHelmValuesJSONNet) {
-		if valuesFile, err = ezops.ConvertJSONNetFileToYAML(valuesFile, opts.Namespace); err != nil {
+	if strings.HasSuffix(opts.Release.ValuesFile, ezdeploy.SuffixHelmValuesJSONNet) {
+		if valuesFile, err = ezdeploy.ConvertJSONNetFileToYAML(valuesFile, opts.Namespace); err != nil {
 			return
 		}
 	}
@@ -218,7 +218,7 @@ func main() {
 	ctx := context.Background()
 
 	// kubernetes client source
-	cs := rg.Must(ezops.ResolveKubernetesClient(optKubeconfig))
+	cs := rg.Must(ezdeploy.ResolveKubernetesClient(optKubeconfig))
 	defer cs.CleanUp()
 
 	if cs.InCluster {
@@ -234,14 +234,14 @@ func main() {
 	db := rg.Must(ezkv.Open(ctx, ezkv.Options{
 		Client:    client,
 		Namespace: "default",
-		Name:      "ezopsdb",
+		Name:      "ezdeploydb",
 	}))
 	defer func() {
 		_ = db.Save(ctx)
 	}()
 
 	// scan
-	result := rg.Must(ezops.Scan("."))
+	result := rg.Must(ezdeploy.Scan("."))
 
 	// sync namespaces
 	err = ezsync.DoPara(ctx, result.Namespaces, 5, func(ctx context.Context, namespace string) (err error) {
