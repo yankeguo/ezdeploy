@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/yankeguo/ezdeploy"
@@ -17,6 +18,13 @@ import (
 	"github.com/yankeguo/ezdeploy/pkg/eztmp"
 	"github.com/yankeguo/rg"
 )
+
+func suffixedCommand(name string) string {
+	if runtime.GOOS == "windows" {
+		return name + ".exe"
+	}
+	return name
+}
 
 type syncNamespaceOptions struct {
 	DB         *ezkv.KV
@@ -113,7 +121,7 @@ func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 		args = append(args, "--dry-run=server")
 	}
 
-	cmd := exec.CommandContext(ctx, "kubectl", args...)
+	cmd := exec.CommandContext(ctx, suffixedCommand("kubectl"), args...)
 	cmd.Stdin = bytes.NewReader(buf)
 	cmd.Stdout = ezlog.NewLogWriter(log.Default(), opts.Title)
 	cmd.Stderr = ezlog.NewLogWriter(log.Default(), opts.Title)
@@ -174,7 +182,7 @@ func syncRelease(ctx context.Context, opts syncReleaseOptions) (err error) {
 		args = append(args, "--dry-run")
 	}
 
-	cmd := exec.CommandContext(ctx, "helm", args...)
+	cmd := exec.CommandContext(ctx, suffixedCommand("helm"), args...)
 	cmd.Stdout = ezlog.NewLogWriter(log.Default(), opts.Title)
 	cmd.Stderr = ezlog.NewLogWriter(log.Default(), opts.Title)
 	rg.Must0(cmd.Run())
