@@ -1,20 +1,22 @@
 package ezblob
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestRandomRevision(t *testing.T) {
-	revision := randomRevision()
+	revision, err := randomRevision()
+	require.NoError(t, err)
 	require.Len(t, revision, 7)
 }
 
-func TestSplitBytes(t *testing.T) {
-	v := splitBytes([]byte("hello,world"), 4)
+func TestChunkify(t *testing.T) {
+	v := chunkify([]byte("hello,world"), 4)
 	require.Equal(t, [][]byte{[]byte("hell"), []byte("o,wo"), []byte("rld")}, v)
-	v = splitBytes([]byte("hello,wo"), 4)
+	v = chunkify([]byte("hello,wo"), 4)
 	require.Equal(t, [][]byte{[]byte("hell"), []byte("o,wo")}, v)
-	v = splitBytes([]byte{}, 4)
+	v = chunkify([]byte{}, 4)
 	require.Nil(t, v)
 }

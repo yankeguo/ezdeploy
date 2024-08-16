@@ -1,7 +1,16 @@
 {
     "cSpell.words": [
+        "apimachinery",
+        "chunkify",
+        "clientcmd",
+        "clientcorev",
+        "Clientset",
+        "corev",
+        "ezblob",
         "ezdeploy",
         "jsonnet",
-        "kubeconfig"
+        "kubeconfig",
+        "metav",
+        "stretchr"
     ]
 }

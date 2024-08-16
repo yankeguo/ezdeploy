@@ -6,15 +6,18 @@ import (
 	"strings"
 )
 
-func randomRevision() string {
-	buf := make([]byte, 4, 4)
-	_, _ = rand.Read(buf)
-	return strings.ToLower(
+func randomRevision() (s string, err error) {
+	buf := make([]byte, 4)
+	if _, err = rand.Read(buf); err != nil {
+		return
+	}
+	s = strings.ToLower(
 		base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buf),
 	)
+	return
 }
 
-func splitBytes(buf []byte, size int) (out [][]byte) {
+func chunkify(buf []byte, size int) (out [][]byte) {
 	count := len(buf) / size
 	if len(buf)%size != 0 {
 		count = count + 1

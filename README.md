@@ -4,10 +4,12 @@ A simple tool to deploy various Kubernetes resources
 
 NO DAEMON, NO SERVICE, JUST ONE-OFF EXECUTION
 
+[中文文档](README.zh.md)
+
 ## Features
 
 - Support `yaml`, `json`, `jsonnet` and `Helm`
-- Incremental update
+- Support incremental updates
 
 ## Installation
 

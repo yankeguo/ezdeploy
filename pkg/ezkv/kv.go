@@ -5,8 +5,9 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/gob"
-	"github.com/yankeguo/ezdeploy/pkg/ezblob"
 	"sync"
+
+	"github.com/yankeguo/ezdeploy/pkg/ezblob"
 )
 
 type Options ezblob.Options
@@ -19,8 +20,12 @@ type Database struct {
 
 // Open create an instance and load existed data / 创建一个实例并载入已有的数据
 func Open(ctx context.Context, opts Options) (db *Database, err error) {
+	var blob *ezblob.Blob
+	if blob, err = ezblob.New(ezblob.Options(opts)); err != nil {
+		return
+	}
 	db = &Database{
-		blob: ezblob.New(ezblob.Options(opts)),
+		blob: blob,
 		lock: &sync.RWMutex{},
 		data: map[string]string{},
 	}
