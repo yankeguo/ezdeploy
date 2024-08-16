@@ -19,7 +19,7 @@ import (
 )
 
 type syncNamespaceOptions struct {
-	DB         *ezkv.Database
+	DB         *ezkv.KV
 	Kubeconfig string
 	Root       string
 	Namespace  string
@@ -68,7 +68,7 @@ func syncNamespace(ctx context.Context, opts syncNamespaceOptions) (err error) {
 }
 
 type syncResourcesOptions struct {
-	DB         *ezkv.Database
+	DB         *ezkv.KV
 	Resources  []ezdeploy.Resource
 	Title      string
 	Namespace  string
@@ -135,7 +135,7 @@ func syncResources(ctx context.Context, opts syncResourcesOptions) (err error) {
 }
 
 type syncReleaseOptions struct {
-	DB         *ezkv.Database
+	DB         *ezkv.KV
 	Release    ezdeploy.Release
 	Title      string
 	Namespace  string

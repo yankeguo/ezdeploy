@@ -2,21 +2,19 @@ package ezkv
 
 import (
 	"context"
+	"os"
+	"strconv"
+	"strings"
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"github.com/yankeguo/ezdeploy/pkg/ezblob"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"testing"
 )
 
-func TestDatabase(t *testing.T) {
-	dirHome, err := os.UserHomeDir()
-	require.NoError(t, err)
-	config, err := clientcmd.BuildConfigFromFlags("", filepath.Join(dirHome, ".kube", "config"))
+func TestKV(t *testing.T) {
+	config, err := clientcmd.BuildConfigFromFlags("", os.Getenv("KUBECONFIG"))
 	require.NoError(t, err)
 	client, err := kubernetes.NewForConfig(config)
 	require.NoError(t, err)
@@ -56,11 +54,12 @@ func TestDatabase(t *testing.T) {
 	err = db.Save(ctx)
 	require.NoError(t, err)
 
-	blob := ezblob.New(ezblob.Options{
+	blob, err := ezblob.New(ezblob.Options{
 		Client:    client,
 		Name:      "ezkv-demo",
 		Namespace: "default",
 	})
+	require.NoError(t, err)
 	err = blob.Delete(ctx)
 	require.NoError(t, err)
 }
