@@ -8,7 +8,12 @@
         "corev",
         "ezblob",
         "ezdeploy",
+        "ezkv",
+        "ezlog",
+        "eztmp",
+        "godirwalk",
         "jsonnet",
+        "karrick",
         "kubeconfig",
         "metav",
         "stretchr"

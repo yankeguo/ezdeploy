@@ -234,7 +234,7 @@ func main() {
 	db := rg.Must(ezkv.Open(ctx, ezkv.Options{
 		Client:    client,
 		Namespace: "default",
-		Name:      "ezdeploydb",
+		Name:      "ezdeploy",
 	}))
 	defer func() {
 		_ = db.Save(ctx)
