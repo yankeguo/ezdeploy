@@ -30,7 +30,7 @@ You can either build binary from source, or just download pre-built binary.
 ## Usage
 
 1. Ensure `kubectl` and `helm` are available in `$PATH`
-2. Prepare a **manifests directory**, see below
+2. Prepare a **resource directory**, see below
 3. Run `ezdeploy`
 
 ## Options
@@ -39,10 +39,10 @@ You can either build binary from source, or just download pre-built binary.
 - `--kubeconfig` or `KUBECONFIG`, specify path to `kubeconfig` file
 - `KUBECONFIG_BASE64`, base64 encoded `kubeconfig` file content
 
-## Layout of Manifests Directory
+## Layout of a Resource Directory
 
 - Each top-level directory stands for a **namespace**
-- Every manifest file in that directory, will be applied to that **namespace**
+- Every resource file in that directory, will be applied to that **namespace**
 
 For example:
 
@@ -78,7 +78,7 @@ kube-system/
 `ezdeploy` will create or update a **release** named `main`, using **chart** `_helm/ingress-nginx`, and **values file**
 `kube-system/primary.ingress-nginx.helm.yaml`
 
-`ezdeploy` also support values file in `jsonnet`
+`ezdeploy` also support values file in `jsonnet`, file name should be `[RELEASE_NAME].[CHART_NAME].helm.jsonnet`
 
 ## Credits
 
